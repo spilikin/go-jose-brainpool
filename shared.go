@@ -24,6 +24,7 @@ import (
 	"fmt"
 
 	"github.com/go-jose/go-jose/v4/json"
+	"github.com/spilikin/go-brainpool"
 )
 
 // KeyAlgorithm represents a key management algorithm.
@@ -97,19 +98,22 @@ const (
 
 // Signature algorithms
 const (
-	EdDSA = SignatureAlgorithm("EdDSA")
-	HS256 = SignatureAlgorithm("HS256") // HMAC using SHA-256
-	HS384 = SignatureAlgorithm("HS384") // HMAC using SHA-384
-	HS512 = SignatureAlgorithm("HS512") // HMAC using SHA-512
-	RS256 = SignatureAlgorithm("RS256") // RSASSA-PKCS-v1.5 using SHA-256
-	RS384 = SignatureAlgorithm("RS384") // RSASSA-PKCS-v1.5 using SHA-384
-	RS512 = SignatureAlgorithm("RS512") // RSASSA-PKCS-v1.5 using SHA-512
-	ES256 = SignatureAlgorithm("ES256") // ECDSA using P-256 and SHA-256
-	ES384 = SignatureAlgorithm("ES384") // ECDSA using P-384 and SHA-384
-	ES512 = SignatureAlgorithm("ES512") // ECDSA using P-521 and SHA-512
-	PS256 = SignatureAlgorithm("PS256") // RSASSA-PSS using SHA256 and MGF1-SHA256
-	PS384 = SignatureAlgorithm("PS384") // RSASSA-PSS using SHA384 and MGF1-SHA384
-	PS512 = SignatureAlgorithm("PS512") // RSASSA-PSS using SHA512 and MGF1-SHA512
+	EdDSA   = SignatureAlgorithm("EdDSA")
+	HS256   = SignatureAlgorithm("HS256")   // HMAC using SHA-256
+	HS384   = SignatureAlgorithm("HS384")   // HMAC using SHA-384
+	HS512   = SignatureAlgorithm("HS512")   // HMAC using SHA-512
+	RS256   = SignatureAlgorithm("RS256")   // RSASSA-PKCS-v1.5 using SHA-256
+	RS384   = SignatureAlgorithm("RS384")   // RSASSA-PKCS-v1.5 using SHA-384
+	RS512   = SignatureAlgorithm("RS512")   // RSASSA-PKCS-v1.5 using SHA-512
+	ES256   = SignatureAlgorithm("ES256")   // ECDSA using P-256 and SHA-256
+	ES384   = SignatureAlgorithm("ES384")   // ECDSA using P-384 and SHA-384
+	ES512   = SignatureAlgorithm("ES512")   // ECDSA using P-521 and SHA-512
+	PS256   = SignatureAlgorithm("PS256")   // RSASSA-PSS using SHA256 and MGF1-SHA256
+	PS384   = SignatureAlgorithm("PS384")   // RSASSA-PSS using SHA384 and MGF1-SHA384
+	PS512   = SignatureAlgorithm("PS512")   // RSASSA-PSS using SHA512 and MGF1-SHA512
+	BP256R1 = SignatureAlgorithm("BP256R1") // ECDSA using BP-256R1 and SHA-256
+	BP384R1 = SignatureAlgorithm("BP384R1") // ECDSA using BP-384R1 and SHA-384
+	BP512R1 = SignatureAlgorithm("BP512R1") // ECDSA using BP-512R1 and SHA-512
 )
 
 // Content encryption algorithms
@@ -451,7 +455,11 @@ func parseCertificateChain(chain []string) ([]*x509.Certificate, error) {
 		}
 		out[i], err = x509.ParseCertificate(raw)
 		if err != nil {
-			return nil, err
+			// retry with brainpool curve
+			out[i], err = brainpool.ParseCertificate(raw)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 	return out, nil
@@ -500,6 +508,8 @@ func curveName(crv elliptic.Curve) (string, error) {
 		return "P-384", nil
 	case elliptic.P521():
 		return "P-521", nil
+	case brainpool.P256r1():
+		return "BP-256", nil
 	default:
 		return "", fmt.Errorf("go-jose/go-jose: unsupported/unknown elliptic curve")
 	}

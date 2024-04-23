@@ -157,7 +157,7 @@ func newECDHRecipient(keyAlg KeyAlgorithm, publicKey *ecdsa.PublicKey) (recipien
 func newECDSASigner(sigAlg SignatureAlgorithm, privateKey *ecdsa.PrivateKey) (recipientSigInfo, error) {
 	// Verify that key management algorithm is supported by this encrypter
 	switch sigAlg {
-	case ES256, ES384, ES512:
+	case ES256, ES384, ES512, BP256R1, BP384R1, BP512R1:
 	default:
 		return recipientSigInfo{}, ErrUnsupportedAlgorithm
 	}
@@ -329,7 +329,7 @@ func (ctx rsaEncrypterVerifier) verifyPayload(payload []byte, signature []byte, 
 	switch alg {
 	case RS256, RS384, RS512:
 		return rsa.VerifyPKCS1v15(ctx.publicKey, hash, hashed, signature)
-	case PS256, PS384, PS512:
+	case PS256, PS384, PS512, BP256R1, BP384R1, BP512R1:
 		return rsa.VerifyPSS(ctx.publicKey, hash, hashed, signature, nil)
 	}
 
@@ -503,13 +503,13 @@ func (ctx ecDecrypterSigner) signPayload(payload []byte, alg SignatureAlgorithm)
 	var hash crypto.Hash
 
 	switch alg {
-	case ES256:
+	case ES256, BP256R1:
 		expectedBitSize = 256
 		hash = crypto.SHA256
-	case ES384:
+	case ES384, BP384R1:
 		expectedBitSize = 384
 		hash = crypto.SHA384
-	case ES512:
+	case ES512, BP512R1:
 		expectedBitSize = 521
 		hash = crypto.SHA512
 	}
@@ -560,13 +560,13 @@ func (ctx ecEncrypterVerifier) verifyPayload(payload []byte, signature []byte, a
 	var hash crypto.Hash
 
 	switch alg {
-	case ES256:
+	case ES256, BP256R1:
 		keySize = 32
 		hash = crypto.SHA256
-	case ES384:
+	case ES384, BP384R1:
 		keySize = 48
 		hash = crypto.SHA384
-	case ES512:
+	case ES512, BP512R1:
 		keySize = 66
 		hash = crypto.SHA512
 	default:

@@ -36,6 +36,7 @@ import (
 	"strings"
 
 	"github.com/go-jose/go-jose/v4/json"
+	"github.com/spilikin/go-brainpool"
 )
 
 // rawJSONWebKey represents a public or private key in JWK format, used for parsing/serializing.
@@ -517,6 +518,12 @@ func (key rawJSONWebKey) ecPublicKey() (*ecdsa.PublicKey, error) {
 		curve = elliptic.P384()
 	case "P-521":
 		curve = elliptic.P521()
+	case "BP-256":
+		curve = brainpool.P256r1()
+	case "BP-384":
+		curve = brainpool.P384r1()
+	case "BP-512":
+		curve = brainpool.P512r1()
 	default:
 		return nil, fmt.Errorf("go-jose/go-jose: unsupported elliptic curve '%s'", key.Crv)
 	}
@@ -694,6 +701,12 @@ func (key rawJSONWebKey) ecPrivateKey() (*ecdsa.PrivateKey, error) {
 		curve = elliptic.P384()
 	case "P-521":
 		curve = elliptic.P521()
+	case "BP-256":
+		curve = brainpool.P256r1()
+	case "BP-384":
+		curve = brainpool.P384r1()
+	case "BP-512":
+		curve = brainpool.P512r1()
 	default:
 		return nil, fmt.Errorf("go-jose/go-jose: unsupported elliptic curve '%s'", key.Crv)
 	}
