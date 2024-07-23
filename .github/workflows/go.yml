@@ -16,12 +16,12 @@ jobs:
           - "1.21.x"
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         persist-credentials: false
 
     - name: Set up Go ${{ matrix.GO_VERSION }}
-      uses: actions/setup-go@v4
+      uses: actions/setup-go@v5
       with:
         go-version: "${{ matrix.GO_VERSION }}"
 
@@ -39,12 +39,12 @@ jobs:
           - "1.22.x"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           persist-credentials: false
 
       - name: Set up Go ${{ matrix.GO_VERSION }}
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           # When Go produces a security release, we want govulncheck to run
           # against the most recently released Go version.
